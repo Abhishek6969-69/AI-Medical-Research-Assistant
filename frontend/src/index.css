@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    'Avenir Next', 'Avenir', 'Gill Sans', 'Trebuchet MS', 'Segoe UI',
+    sans-serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #121212;
+  color: #f4f4f5;
+  font-family: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.28);
+  color: #fff;
+}
