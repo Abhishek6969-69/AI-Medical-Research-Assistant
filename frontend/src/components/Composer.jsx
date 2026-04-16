@@ -1,35 +1,55 @@
 export function Composer({ label, placeholder, value, onChange, onSend, loading, status }) {
+  const isDisabled = !value.trim() || loading
+
   return (
-    <footer className="rounded-[26px] border border-white/10 bg-white/[0.03] p-5">
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-[0.82rem] font-semibold uppercase tracking-[0.18em] text-white/42">
-            {label}
-          </p>
-          <p className="mt-2 text-[0.96rem] text-white/52">
-            {status || 'Add context to refine the clinical search.'}
-          </p>
+    <footer className="border-t border-[var(--border)] bg-[var(--bg-base)] px-[48px] py-[20px] shrink-0">
+      <div className="flex flex-col mx-auto max-w-[800px]">
+        {status && <div className="mb-2 text-[12px] text-[var(--text-muted)] animate-pulse">{status}</div>}
+        <div className="flex items-end bg-[var(--bg-elevated)] border border-[var(--border)] rounded-[14px] p-[12px] px-[16px] transition-colors focus-within:border-[var(--accent)]">
+          <textarea
+            rows={1}
+            placeholder={placeholder || 'Ask a follow-up question...'}
+            value={value}
+            onChange={(e) => {
+              onChange(e.target.value)
+              e.target.style.height = 'auto'
+              e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                if (!isDisabled) onSend()
+              }
+            }}
+            className="flex-1 bg-transparent border-none outline-none resize-none min-h-[24px] max-h-[160px] text-[14px] text-[var(--text-primary)] leading-[1.6] placeholder:text-[var(--text-muted)]"
+          />
+          <button
+            type="button"
+            onClick={onSend}
+            disabled={isDisabled}
+            className={`shrink-0 ml-[12px] w-[36px] h-[36px] rounded-full flex items-center justify-center transition-all ${
+              isDisabled 
+                ? 'bg-[var(--border)] text-[var(--text-muted)] cursor-not-allowed' 
+                : 'bg-[var(--accent)] text-[#0A0A0F] hover:bg-[var(--accent-hover)] active:scale-95 cursor-pointer'
+            }`}
+          >
+            {loading ? (
+              <span className="flex gap-[3px]">
+                <span className="w-1 h-1 rounded-full bg-[#0A0A0F] animate-pulse"></span>
+                <span className="w-1 h-1 rounded-full bg-[#0A0A0F] animate-pulse delay-75"></span>
+                <span className="w-1 h-1 rounded-full bg-[#0A0A0F] animate-pulse delay-150"></span>
+              </span>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            )}
+          </button>
         </div>
-      </div>
-
-      <div className="grid min-h-[164px] grid-cols-[minmax(0,1fr)_auto] gap-4">
-        <textarea
-          rows={4}
-          placeholder={placeholder}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="resize-none rounded-[18px] border border-white/10 bg-[#222222] px-5 py-4 text-[1.04rem] font-semibold leading-7 text-zinc-50 outline-none placeholder:text-white/38 transition focus:border-emerald-400/40 focus:ring-2 focus:ring-emerald-400/18"
-        />
-
-        <button
-          type="button"
-          onClick={onSend}
-          disabled={loading}
-          className="mt-auto grid h-16 w-16 place-items-center rounded-[18px] border border-emerald-300/18 bg-emerald-400/12 text-[1.35rem] text-emerald-50 transition hover:bg-emerald-400/18 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-          aria-label="Send question"
-        >
-          {loading ? '...' : '→'}
-        </button>
+        <div className="mt-2 text-center text-[11px] text-[var(--text-muted)]">
+          {label}
+        </div>
       </div>
     </footer>
   )

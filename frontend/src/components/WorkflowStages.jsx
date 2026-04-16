@@ -1,7 +1,9 @@
 export function WorkflowStages({ stages }) {
+  const stageItems = Array.isArray(stages) ? stages : []
+
   return (
     <section className="grid gap-3 lg:grid-cols-3">
-      {stages.map((stage, index) => (
+      {stageItems.map((stage, index) => (
         <article
           key={stage.title}
           className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/15 hover:bg-white/[0.045]"

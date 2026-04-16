@@ -12,6 +12,25 @@ const messageSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    sources: {
+      type: [
+        {
+          title: String,
+          abstract: String,
+          authors: [String],
+          year: Number,
+          source: String,
+          url: String,
+          citationCount: Number,
+          status: String,
+          semanticScore: Number,
+          recencyScore: Number,
+          credibilityScore: Number,
+          finalScore: Number,
+        },
+      ],
+      default: [],
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -37,6 +56,53 @@ const conversationSchema = new mongoose.Schema(
     lastQuery: {
       type: String,
       trim: true,
+    },
+    retrieval: {
+      rawPoolCount: { type: Number, default: 0 },
+      sourceCounts: {
+        PubMed: { type: Number, default: 0 },
+        OpenAlex: { type: Number, default: 0 },
+        ClinicalTrials: { type: Number, default: 0 },
+      },
+      topResults: {
+        type: [
+          {
+            title: String,
+            abstract: String,
+            authors: [String],
+            year: Number,
+            source: String,
+            url: String,
+            citationCount: Number,
+            status: String,
+            semanticScore: Number,
+          },
+        ],
+        default: [],
+      },
+    },
+    answer: {
+      type: String,
+      default: '',
+    },
+    sources: {
+      type: [
+        {
+          title: String,
+          abstract: String,
+          authors: [String],
+          year: Number,
+          source: String,
+          url: String,
+          citationCount: Number,
+          status: String,
+          semanticScore: Number,
+          recencyScore: Number,
+          credibilityScore: Number,
+          finalScore: Number,
+        },
+      ],
+      default: [],
     },
     messages: {
       type: [messageSchema],

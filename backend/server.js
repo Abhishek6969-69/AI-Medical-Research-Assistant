@@ -4,16 +4,22 @@ const dotenv = require('dotenv')
 const path = require('path')
 const fs = require('fs')
 
+dotenv.config()
+
+const backendEnvPath = path.resolve(__dirname, '.env')
+const frontendEnvPath = path.resolve(__dirname, '../frontend/.env')
+
+if (fs.existsSync(backendEnvPath)) {
+  dotenv.config({ path: backendEnvPath, override: false })
+}
+
+if (fs.existsSync(frontendEnvPath)) {
+  dotenv.config({ path: frontendEnvPath, override: false })
+}
+
 const connectDB = require('./src/config/db')
 const authRoutes = require('./src/routes/authRoutes')
 const chatRoutes = require('./src/routes/chatRoutes')
-
-dotenv.config()
-
-const fallbackEnvPath = path.resolve(__dirname, '../frontend/.env')
-if (!process.env.MONGODB_URI && fs.existsSync(fallbackEnvPath)) {
-  dotenv.config({ path: fallbackEnvPath })
-}
 
 const app = express()
 const PORT = process.env.PORT || 5000

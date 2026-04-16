@@ -1,22 +1,38 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans:
-    'Avenir Next', 'Avenir', 'Gill Sans', 'Trebuchet MS', 'Segoe UI',
-    sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+  --bg-base: #0A0A0F;
+  --bg-surface: #111118;
+  --bg-elevated: #1A1A24;
+  --bg-hover: #1E1E2A;
+  --border: #2A2A38;
+  --border-subtle: #1E1E2A;
+  --text-primary: #F0F0F5;
+  --text-secondary: #8B8BA0;
+  --text-muted: #55556A;
+  --accent: #00C896;
+  --accent-dim: #00C89615;
+  --accent-hover: #00B085;
+  --danger: #FF4D6A;
+  --info: #4D8EFF;
 }
 
 html,
 body,
 #root {
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
   margin: 0;
-  background: #121212;
-  color: #f4f4f5;
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -24,6 +40,31 @@ body {
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.28);
-  color: #fff;
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Hide scrollbars completely while retaining scrollability */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-up {
+  opacity: 0;
+  animation: fadeSlideUp 200ms ease forwards;
 }

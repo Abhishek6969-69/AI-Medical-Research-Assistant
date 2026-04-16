@@ -1,21 +1,22 @@
-export function WorkspaceHeader({ title, subtitle, status }) {
-  return (
-    <header className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className="text-[0.8rem] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
-          Curalink Console
-        </p>
-        <h2 className="mt-2 text-[1.5rem] font-semibold tracking-[-0.04em] text-zinc-50 sm:text-[1.8rem]">
-          {title}
-        </h2>
-        <p className="mt-2 max-w-2xl text-[0.98rem] leading-7 text-white/58">
-          {subtitle}
-        </p>
-      </div>
+export function WorkspaceHeader({ user, onLogout }) {
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'AY'
 
-      <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white/75">
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,0.12)]" />
-        {status}
+  return (
+    <header className="h-[56px] bg-[var(--bg-surface)] border-b border-[var(--border)] flex items-center justify-between px-6 shrink-0 z-10 w-full relative">
+      <div className="md:hidden">
+        {/* Mobile menu space buffer for hamburger */}
+      </div>
+      <div className="flex-1" />
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={onLogout}
+          className="text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          Sign out
+        </button>
+        <div className="flex items-center justify-center w-[32px] h-[32px] rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] text-[12px] font-semibold text-[var(--text-secondary)]">
+          {initials}
+        </div>
       </div>
     </header>
   )

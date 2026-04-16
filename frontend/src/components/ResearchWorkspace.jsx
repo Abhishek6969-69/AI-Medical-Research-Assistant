@@ -1,14 +1,8 @@
 import { Composer } from './Composer'
-
-function getInitials(name) {
-  if (!name) return 'JS'
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('')
-}
+import { AnswerBubble } from './AnswerBubble'
+import { SourceTags } from './SourceTags'
+import { WorkspaceHeader } from './WorkspaceHeader'
+import { useRef, useEffect } from 'react'
 
 export function ResearchWorkspace({
   copy,
@@ -19,47 +13,99 @@ export function ResearchWorkspace({
   onSend,
   sending,
   status,
-  response,
+  messages = [],
 }) {
-  const initials = getInitials(user?.name)
+  const isStarted = messages.length > 0 || sending
+  const scrollRef = useRef(null)
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [messages, sending])
 
   return (
-    <section className="flex min-h-0 flex-col gap-5 bg-[linear-gradient(180deg,rgba(46,46,46,0.96),rgba(35,35,35,0.98))] px-4 py-5 sm:px-5 lg:px-7 lg:py-6">
-      <div className="flex items-center justify-end gap-3">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-white text-lg font-semibold text-[#514bb8] shadow-sm">
-          {initials}
-        </div>
-        <button
-          type="button"
-          className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/[0.05]"
-          onClick={onLogout}
-        >
-          Sign out
-        </button>
-      </div>
+    <section className="flex flex-col flex-1 min-w-0 bg-[var(--bg-base)]">
+      <WorkspaceHeader user={user} onLogout={onLogout} />
 
-      <div className="rounded-[24px] border border-white/10 bg-white/[0.03] px-5 py-5">
-        <p className="text-[0.82rem] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
-          {copy.stageTitle}
-        </p>
-        <p className="mt-3 max-w-2xl text-[1rem] leading-7 text-white/60">
-          {copy.stageSubtitle}
-        </p>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        {copy.pipelineSteps.map((step, index) => (
-          <article
-            key={step.title}
-            className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4"
-          >
-            <p className="text-[0.76rem] font-semibold uppercase tracking-[0.18em] text-white/38">
-              0{index + 1}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto w-full flex flex-col relative group">
+        {!isStarted ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-[800px] w-full mx-auto my-auto text-center">
+            <div className="w-[48px] h-[48px] rounded-[16px] bg-[var(--accent-dim)] flex items-center justify-center shrink-0 mb-6 border border-[var(--accent)]/20 shadow-[0_0_40px_rgba(0,200,150,0.1)]">
+              <span className="text-[var(--accent)] text-[24px] font-bold">C</span>
+            </div>
+            <h2 className="text-[20px] font-medium text-[var(--text-primary)] mb-2">
+              What would you like to research today?
+            </h2>
+            <p className="text-[14px] text-[var(--text-muted)] mb-10">
+              Fill in your patient context and start a session
             </p>
-            <h2 className="mt-3 text-[1rem] font-semibold text-zinc-50">{step.title}</h2>
-            <p className="mt-2 text-[0.92rem] leading-6 text-white/54">{step.detail}</p>
-          </article>
-        ))}
+            <div className="flex flex-wrap gap-3 justify-center">
+              {["Latest lung cancer treatments", "Clinical trials for diabetes", "Alzheimer's research 2024"].map(chip => (
+                <button
+                  key={chip}
+                  className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-full px-[16px] py-[8px] text-[13px] text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--text-primary)] focus:outline-none"
+                  onClick={() => onQueryChange(chip)}
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6 px-[48px] py-[32px] max-w-[900px] mx-auto w-full pb-20">
+            {messages.map((msg, index) => {
+              if (msg.role === 'user') {
+                return (
+                  <div key={index} className="flex justify-end mt-2 animate-fade-slide-up">
+                    <div className="bg-[var(--accent)] text-[#0A0A0F] rounded-[18px_18px_4px_18px] px-[18px] py-[12px] text-[14px] leading-[1.6] max-w-[72%] shadow-sm whitespace-pre-wrap">
+                      {msg.content}
+                    </div>
+                  </div>
+                )
+              }
+
+              if (msg.role === 'ai') {
+                return (
+                  <div key={index} className="flex flex-col mt-4 animate-fade-slide-up">
+                    <div className="flex gap-4">
+                      <div className="w-[32px] h-[32px] rounded-full flex shrink-0 items-center justify-center text-[11px] font-bold text-white shadow-sm mt-[2px] bg-[linear-gradient(135deg,#00C896,#4D8EFF)]">
+                        AI
+                      </div>
+                      <div className="flex-1 flex flex-col min-w-0">
+                        <div className="flex flex-col gap-6 text-[14px] leading-[1.8] text-[var(--text-primary)]">
+                          <AnswerBubble answer={msg.content} />
+                          <SourceTags sourceCounts={msg.sourceCounts} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+              return null
+            })}
+
+            {sending && (
+              <div className="flex flex-col mt-4 animate-fade-slide-up">
+                <div className="flex gap-4">
+                  <div className="w-[32px] h-[32px] rounded-full flex shrink-0 items-center justify-center text-[11px] font-bold text-white shadow-sm mt-[2px] bg-[linear-gradient(135deg,#00C896,#4D8EFF)]">
+                    AI
+                  </div>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex items-center gap-[4px] h-[36px] px-2 text-[var(--accent)]">
+                      <span className="w-[6px] h-[6px] rounded-full bg-current animate-pulse"></span>
+                      <span className="w-[6px] h-[6px] rounded-full bg-current animate-pulse delay-100"></span>
+                      <span className="w-[6px] h-[6px] rounded-full bg-current animate-pulse delay-200"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <Composer
@@ -71,15 +117,6 @@ export function ResearchWorkspace({
         loading={sending}
         status={status}
       />
-
-      <div className="rounded-[22px] border border-white/10 bg-[#252525] p-5">
-        <h3 className="text-[1rem] font-semibold uppercase tracking-[0.18em] text-white/42">
-          {copy.responseTitle}
-        </h3>
-        <p className="mt-3 text-[0.96rem] leading-7 text-white/64">
-          {response || copy.responsePlaceholder}
-        </p>
-      </div>
     </section>
   )
 }

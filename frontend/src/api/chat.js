@@ -6,3 +6,7 @@ export function sendChatPayload(payload) {
     body: payload,
   })
 }
+
+export function getChatHistory() {
+  return apiRequest('/chat/history')
+}
