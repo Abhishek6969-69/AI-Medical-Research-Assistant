@@ -320,36 +320,50 @@ async function fetchJson(url) {
   return payload
 }
 
-async function fetchPubMed(searchQuery) {
-  const esearchUrl = new URL(PUBMED_ESEARCH_URL)
-  esearchUrl.searchParams.set('db', 'pubmed')
-  esearchUrl.searchParams.set('term', searchQuery)
-  esearchUrl.searchParams.set('retmode', 'json')
-  esearchUrl.searchParams.set('retmax', '100')
-  esearchUrl.searchParams.set('sort', 'relevance')
+async function fetchPubMed(searchQuery, fallbackQuery = '') {
+  async function runSearch(term) {
+    const esearchUrl = new URL(PUBMED_ESEARCH_URL)
+    esearchUrl.searchParams.set('db', 'pubmed')
+    esearchUrl.searchParams.set('term', term)
+    esearchUrl.searchParams.set('retmode', 'json')
+    esearchUrl.searchParams.set('retmax', '100')
+    esearchUrl.searchParams.set('sort', 'relevance')
 
-  const esearchPayload = await fetchJson(esearchUrl.toString())
-  const ids = esearchPayload?.esearchresult?.idlist || []
+    const esearchPayload = await fetchJson(esearchUrl.toString())
+    const ids = esearchPayload?.esearchresult?.idlist || []
+    if (!ids.length) return []
 
-  if (!ids.length) {
-    return []
+    const efetchUrl = new URL(PUBMED_EFETCH_URL)
+    efetchUrl.searchParams.set('db', 'pubmed')
+    efetchUrl.searchParams.set('id', ids.slice(0, 100).join(','))
+    efetchUrl.searchParams.set('retmode', 'xml')
+    efetchUrl.searchParams.set('rettype', 'abstract')
+
+    const response = await fetch(efetchUrl.toString())
+    const xml = await response.text()
+    if (!response.ok) throw new Error(`PubMed efetch failed: ${xml || response.statusText}`)
+    return parsePubMedXml(xml).slice(0, 100)
   }
 
-  const efetchUrl = new URL(PUBMED_EFETCH_URL)
-  efetchUrl.searchParams.set('db', 'pubmed')
-  efetchUrl.searchParams.set('id', ids.slice(0, 100).join(','))
-  efetchUrl.searchParams.set('retmode', 'xml')
-  efetchUrl.searchParams.set('rettype', 'abstract')
+  // Primary search with Boolean query
+  let results = await runSearch(searchQuery)
 
-  const response = await fetch(efetchUrl.toString())
-  const xml = await response.text()
-
-  if (!response.ok) {
-    throw new Error(`PubMed efetch failed: ${xml || response.statusText}`)
+  // If primary returns very few results, fall back to a simpler keyword search
+  if (results.length < 3 && fallbackQuery && fallbackQuery !== searchQuery) {
+    const fallbackResults = await runSearch(fallbackQuery)
+    // Merge, deduplicate by title
+    const seen = new Set(results.map((r) => r.title))
+    for (const r of fallbackResults) {
+      if (!seen.has(r.title)) {
+        results.push(r)
+        seen.add(r.title)
+      }
+    }
   }
 
-  return parsePubMedXml(xml).slice(0, 100)
+  return results
 }
+
 
 async function fetchOpenAlex(searchQuery) {
   const url = new URL(OPENALEX_WORKS_URL)

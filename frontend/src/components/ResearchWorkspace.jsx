@@ -77,7 +77,7 @@ export function ResearchWorkspace({
                       </div>
                       <div className="flex-1 flex flex-col min-w-0">
                         <div className="flex flex-col gap-6 text-[14px] leading-[1.8] text-[var(--text-primary)]">
-                          <AnswerBubble answer={msg.content} />
+                          <AnswerBubble answer={msg.content} sources={msg.sources || []} />
                           <SourceTags sourceCounts={msg.sourceCounts} />
                         </div>
                       </div>

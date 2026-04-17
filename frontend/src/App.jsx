@@ -1,21 +1,21 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
-import { useAuth } from './context/useAuth'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { PublicRoute } from './components/PublicRoute'
 import { DashboardPage } from './pages/DashboardPage'
 import { SignInPage } from './pages/SignInPage'
 import { SignUpPage } from './pages/SignUpPage'
+import { LandingPage } from './pages/LandingPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route
-            path="/"
-            element={<DefaultRoute />}
-          />
+          {/* Landing page is always the default root — no redirect */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+
           <Route
             path="/signin"
             element={
@@ -40,19 +40,10 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/signin" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
   )
 }
 
-function DefaultRoute() {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return null
-  }
-
-  return <Navigate to={user ? '/app' : '/signin'} replace />
-}

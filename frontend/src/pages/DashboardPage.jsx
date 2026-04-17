@@ -56,7 +56,12 @@ export function DashboardPage() {
       
       setMessages((curr) => [
         ...curr, 
-        { role: 'ai', content: result.answer || '', sourceCounts: result.sourceCounts || {} }
+        { 
+          role: 'ai', 
+          content: result.answer || '', 
+          sourceCounts: result.sourceCounts || {},
+          sources: result.sources || [],
+        }
       ])
 
       setForm((curr) => ({ ...curr, query: '' }))

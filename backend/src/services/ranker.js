@@ -28,9 +28,9 @@ function rankResults(scoredPool) {
       credibilityScore: Number(credibilityScore(result).toFixed(4)),
       finalScore: Number(
         (
-          result.semanticScore * 0.5 +
-          recencyScore(result.year) * 0.3 +
-          credibilityScore(result) * 0.2
+          result.semanticScore * 0.65 +
+          recencyScore(result.year) * 0.2 +
+          credibilityScore(result) * 0.15
         ).toFixed(4)
       ),
     }))

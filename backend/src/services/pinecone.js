@@ -27,7 +27,7 @@ async function upsertEmbeddings(conversationId, records) {
       conversationId,
       title: record.title,
       abstract: record.abstract,
-      authors: record.authors.join(', '),
+      authors: Array.isArray(record.authors) ? record.authors.join(', ') : String(record.authors || 'Unknown'),
       year: record.year,
       source: record.source,
       url: record.url,

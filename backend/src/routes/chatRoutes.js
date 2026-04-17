@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
     })
 
     const [pubmedResults, openAlexResults, trialResults] = await Promise.all([
-      fetchPubMed(searchBundle.publicationQuery),
+      fetchPubMed(searchBundle.publicationQuery, searchBundle.expandedQuery),
       fetchOpenAlex(searchBundle.openAlexQuery),
       fetchTrials(searchBundle.trialQuery, location?.trim?.() || ''),
     ])
@@ -159,8 +159,10 @@ router.post('/', async (req, res) => {
       },
     })
   } catch (error) {
+    console.error(' [Chat Error]:', error)
     return res.status(500).json({
       message: error.message || 'Unable to process chat payload',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     })
   }
 })
