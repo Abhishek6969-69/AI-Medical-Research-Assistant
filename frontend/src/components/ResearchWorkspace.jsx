@@ -14,6 +14,7 @@ export function ResearchWorkspace({
   sending,
   status,
   messages = [],
+  onToggleSidebar,
 }) {
   const isStarted = messages.length > 0 || sending
   const scrollRef = useRef(null)
@@ -29,7 +30,7 @@ export function ResearchWorkspace({
 
   return (
     <section className="flex flex-col flex-1 min-w-0 bg-[var(--bg-base)]">
-      <WorkspaceHeader user={user} onLogout={onLogout} />
+      <WorkspaceHeader user={user} onLogout={onLogout} onToggleSidebar={onToggleSidebar} />
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto w-full flex flex-col relative group">
         {!isStarted ? (

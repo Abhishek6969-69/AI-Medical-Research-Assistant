@@ -1,26 +1,51 @@
 import { SidebarField } from './SidebarField'
 
-export function Sidebar({ copy, values, sessions = [], onFieldChange, onStartSession, conversationId }) {
+export function Sidebar({ copy, values, sessions = [], onFieldChange, onStartSession, conversationId, isOpen, onClose }) {
   const fields = Array.isArray(copy?.fields) ? copy.fields : []
   const focusOptions = Array.isArray(copy?.focusOptions) ? copy.focusOptions : []
 
   return (
-    <aside className="w-[300px] shrink-0 h-full overflow-y-auto bg-[var(--bg-surface)] border-r border-[var(--border)] hidden md:flex flex-col">
-      <header className="px-5 py-5 border-b border-[var(--border-subtle)] shrink-0">
-        <h1 className="text-[1.2rem] font-semibold text-white tracking-tight flex items-center gap-1">
-          <span>{String(copy?.brand || 'Cura').slice(0, 4)}</span>
-          <span className="text-[var(--accent)]">{String(copy?.brand || 'link').slice(4)}</span>
-        </h1>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.05em] font-medium text-[var(--text-muted)]">
-          {copy?.tagline || 'AI Medical Research Assistant'}
-        </p>
-      </header>
+    <>
+      {/* Backdrop for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-8">
-        <section className="flex flex-col gap-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-            {copy?.sectionLabel || 'Patient context'}
-          </p>
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-[300px] bg-[var(--bg-surface)] border-r border-[var(--border)] 
+        flex flex-col transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:relative md:translate-x-0 md:flex md:h-full md:shrink-0
+      `}>
+        <header className="px-5 py-5 border-b border-[var(--border-subtle)] shrink-0 flex items-center justify-between">
+          <div>
+            <h1 className="text-[1.2rem] font-semibold text-white tracking-tight flex items-center gap-1">
+              <span>{String(copy?.brand || 'Cura').slice(0, 4)}</span>
+              <span className="text-[var(--accent)]">{String(copy?.brand || 'link').slice(4)}</span>
+            </h1>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.05em] font-medium text-[var(--text-muted)]">
+              {copy?.tagline || 'AI Medical Research Assistant'}
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="md:hidden p-2 text-[var(--text-muted)] hover:text-white transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </header>
+
+        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-8">
+          <section className="flex flex-col gap-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              {copy?.sectionLabel || 'Patient context'}
+            </p>
 
           <div className="flex flex-col gap-[14px]">
             {fields.map((field) => (
@@ -103,5 +128,6 @@ export function Sidebar({ copy, values, sessions = [], onFieldChange, onStartSes
         </section>
       </div>
     </aside>
+    </>
   )
 }

@@ -27,6 +27,8 @@ export function DashboardPage() {
   const [messages, setMessages] = useState([])
   const [sessions, setSessions] = useState([])
 
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
+  
   useEffect(() => {
     getChatHistory()
       .then(res => setSessions(res.sessions || []))
@@ -46,6 +48,7 @@ export function DashboardPage() {
     setMessages((curr) => [...curr, { role: 'user', content: payload.query }])
     setSending(true)
     setStatus('Sending payload to /api/chat...')
+    setSidebarOpen(false) // Close on mobile when starting
 
     try {
       const result = await sendChatPayload({
@@ -123,7 +126,7 @@ export function DashboardPage() {
   }
 
   return (
-    <main className="flex h-dvh w-full overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)]">
+    <main className="flex h-dvh w-full overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] relative">
       <Sidebar
         copy={appCopy.sidebar}
         values={form}
@@ -131,6 +134,8 @@ export function DashboardPage() {
         onFieldChange={handleFieldChange}
         onStartSession={handleStartSession}
         conversationId={conversationId}
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
       <ResearchWorkspace
         copy={appCopy.workspace}
@@ -142,6 +147,7 @@ export function DashboardPage() {
         sending={sending}
         status={status}
         messages={messages}
+        onToggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
       />
     </main>
   )
