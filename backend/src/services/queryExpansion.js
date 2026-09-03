@@ -1,5 +1,6 @@
 function normalizeText(value) {
   return String(value || '')
+    .replace(/[?]+\s*$/g, '')
     .replace(/\s+/g, ' ')
     .trim()
 }
