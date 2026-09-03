@@ -1,20 +1,20 @@
-const { HfInference } = require('@huggingface/inference')
+const Groq = require('groq-sdk');
 
 function getTextModel() {
-  return process.env.HF_TEXT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
+  return process.env.GROQ_MODEL || 'qwen/qwen3.8-27b';
 }
 
 async function generateAnswer({ systemPrompt, userMessage }) {
-  const hfToken = process.env.HF_TOKEN
+  const groqApiKey = process.env.GROQ_API_KEY;
 
-  if (!hfToken) {
-    throw new Error('HF_TOKEN is not configured')
+  if (!groqApiKey) {
+    throw new Error('GROQ_API_KEY is not configured in .env');
   }
 
-  const hf = new HfInference(hfToken)
+  const groq = new Groq({ apiKey: groqApiKey });
 
   try {
-    const response = await hf.chatCompletion({
+    const response = await groq.chat.completions.create({
       model: getTextModel(),
       messages: [
         { role: 'system', content: systemPrompt },
@@ -23,21 +23,21 @@ async function generateAnswer({ systemPrompt, userMessage }) {
       max_tokens: 700,
       temperature: 0.2,
       top_p: 0.9,
-    })
+    });
 
-    const generatedText = response.choices?.[0]?.message?.content
+    const generatedText = response.choices?.[0]?.message?.content;
 
     if (!generatedText) {
-      throw new Error('No generated text returned from Hugging Face')
+      throw new Error('No generated text returned from Groq');
     }
 
-    return generatedText
+    return generatedText;
   } catch (error) {
-    const message = error.message || 'Hugging Face text generation failed'
-    throw new Error(`Hugging Face API Error: ${message}`)
+    const message = error.message || 'Groq text generation failed';
+    throw new Error(`Groq API Error: ${message}`);
   }
 }
 
 module.exports = {
   generateAnswer,
-}
+};

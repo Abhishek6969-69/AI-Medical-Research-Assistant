@@ -19,7 +19,7 @@ const router = express.Router()
 
 router.post('/', async (req, res) => {
   try {
-    const requiredEnvKeys = ['MONGODB_URI', 'JWT_SECRET', 'HF_TOKEN', 'PINECONE_API_KEY']
+    const requiredEnvKeys = ['MONGODB_URI', 'JWT_SECRET', 'GROQ_API_KEY', 'PINECONE_API_KEY']
     const missingEnvKeys = requiredEnvKeys.filter((key) => !process.env[key])
 
     if (missingEnvKeys.length) {
